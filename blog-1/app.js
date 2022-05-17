@@ -2,12 +2,24 @@
  * @Author: Reya
  * @Date: 2022-05-10 09:11:15
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-14 18:02:18
+ * @LastEditTime: 2022-05-16 17:21:43
  * @Description: 基础信息配置
  */
 const querystring = require('querystring');
 const handleBlogRouter = require('./src/router/blog')
 const handleUserRouter = require('./src/router/user')
+
+// 获取cookie的过期时间
+const getCookieExpires = () => {
+    const d = new Date()
+    // 当前时间+24h
+    d.setTime(d.getTime() + (24 * 60 * 60 * 1000))
+    console.log('d.toUTCString() is', d.toUTCString())
+    return d.toUTCString()
+}
+
+// session数据
+const SESSION_DATA = {}
 
 // 用于处理 post data
 const getPostData = (req) => {
@@ -59,21 +71,36 @@ const serverHandle = (req, res) => {
         const val = arr[1].trim()
         req.cookie[key] = val
     })
-    console.log('req.cookie:',req.cookie)
+
+    // 解析 session
+    let needSetCookie = false
+    let userId = req.cookie.userid
+    if (userId) {
+        if (!SESSION_DATA[userId]) {
+            SESSION_DATA[userId] = {}
+        }
+    } else {
+        needSetCookie = true
+        userId = `${Date.now()}_${Math.random()}`
+        SESSION_DATA[userId] = {}    
+    }
+    console.log('SESSION_DATA:',SESSION_DATA)
+    req.session = SESSION_DATA[userId]
 
     // 处理 post data
     getPostData(req).then(postData => {
         req.body = postData
 
         // 处理 blog 路由
-        // const blogData = handleBlogRouter(req, res)
-        // if (blogData) {
-        //     res.end(JSON.stringify(blogData))
-        //     return
-        // } 
         const blogResult = handleBlogRouter(req, res)
         if (blogResult) {
             blogResult.then(blogData => {
+                // 没有cookie,设置cookie
+                // 设置在根路由下，这样所有的路径都会生效;httpOnly:只允许服务器端更改
+                if (needSetCookie) {
+                    res.setHeader('Set-Cookie', `userid=${userId};path=/;httpOnly;expires=${getCookieExpires()}`)
+                }
+
                 res.end(JSON.stringify(blogData))
             })
             return
@@ -82,14 +109,13 @@ const serverHandle = (req, res) => {
 
 
         // 处理 user 路由
-        // const userData = handleUserRouter(req, res)
-        // if (userData) {
-        //     res.end(JSON.stringify(userData))
-        //     return
-        // }
         const userResult = handleUserRouter(req, res)
         if (userResult) {
             userResult.then(userData => {
+                if (needSetCookie) {
+                    res.setHeader('Set-Cookie', `userid=${userId};path=/;httpOnly;expires=${getCookieExpires()}`)
+                }
+
                 res.end(JSON.stringify(userData))
             })
             return
