@@ -2,11 +2,12 @@
  * @Author: Reya
  * @Date: 2022-05-10 20:36:19
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-16 17:11:28
+ * @LastEditTime: 2022-05-17 11:31:15
  * @Description: 处理用户相关路由
  */
 const { login } = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
+const { set } = require('../db/redis')
 
 // 获取cookie的过期时间
 const getCookieExpires = () => {
@@ -21,16 +22,16 @@ const handleUserRouter = (req, res) => {
     const method = req.method // GET POST
 
     // 登录
-    // if (method === 'POST' && req.path === '/api/user/login') {
-    if (method === 'GET' && req.path === '/api/user/login') {
-        // const { username, password } = req.body
-        const { username, password } = req.query
+    if (method === 'POST' && req.path === '/api/user/login') {
+        const { username, password } = req.body
         const result = login(username, password)
         return result.then(data => {
             if (data.username) {
                 // 设置session
                 req.session.username = data.username
                 req.session.realname = data.realname
+                // 同步到redis
+                set(req.sessionId,req.session)
 
                 console.log(' req.session is', req.session)
                 return new SuccessModel('登录成功')
@@ -41,7 +42,7 @@ const handleUserRouter = (req, res) => {
     } 
 
     // 登录验证的测试
-    if (method === 'GET' && req.path === '/api/user/login-test') {
+/*     if (method === 'GET' && req.path === '/api/user/login-test') {
         if (req.session.username) {
             return Promise.resolve(new SuccessModel({
                 // username:req.session.username
@@ -49,7 +50,7 @@ const handleUserRouter = (req, res) => {
             }))
         }
         return Promise.resolve(new ErrorModel('尚未登录') )
-    }
+    } */
 
 }
 

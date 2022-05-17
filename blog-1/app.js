@@ -2,10 +2,11 @@
  * @Author: Reya
  * @Date: 2022-05-10 09:11:15
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-16 17:21:43
+ * @LastEditTime: 2022-05-17 11:08:05
  * @Description: 基础信息配置
  */
 const querystring = require('querystring');
+const { get, set } = require('./src/db/redis')
 const handleBlogRouter = require('./src/router/blog')
 const handleUserRouter = require('./src/router/user')
 
@@ -19,7 +20,7 @@ const getCookieExpires = () => {
 }
 
 // session数据
-const SESSION_DATA = {}
+// const SESSION_DATA = {}
 
 // 用于处理 post data
 const getPostData = (req) => {
@@ -72,8 +73,8 @@ const serverHandle = (req, res) => {
         req.cookie[key] = val
     })
 
-    // 解析 session
-    let needSetCookie = false
+    // 解析 session(不用redis)
+    /* let needSetCookie = false
     let userId = req.cookie.userid
     if (userId) {
         if (!SESSION_DATA[userId]) {
@@ -85,10 +86,38 @@ const serverHandle = (req, res) => {
         SESSION_DATA[userId] = {}    
     }
     console.log('SESSION_DATA:',SESSION_DATA)
-    req.session = SESSION_DATA[userId]
+    req.session = SESSION_DATA[userId] */
 
-    // 处理 post data
-    getPostData(req).then(postData => {
+
+    // 解析session（使用redis）
+    let needSetCookie = false
+    let userId = req.cookie.userid
+    // cookie 中无userId
+    if (!userId) {
+        needSetCookie = true
+        userId = `${Date.now()}_${Math.random()}`
+        // 初始化 redis 中的 session 值
+        set(userId, {})
+    } 
+    // 获取session
+    req.sessionId = userId
+    // 获取userId对应的信息
+    get(req.sessionId).then(sessionData => {
+        
+        if (sessionData == null) {
+            // redis中没有存这个userId
+            // 初始化 redis 中的 session值
+            set(req.sessionId, {})
+            // 设置session
+            req.session = {}
+        } else {
+            // 取出redis中该userId的信息
+            req.session = sessionData
+        }
+
+        // 处理 post data
+        return getPostData(req)
+    }).then(postData => {
         req.body = postData
 
         // 处理 blog 路由
@@ -125,9 +154,6 @@ const serverHandle = (req, res) => {
         res.write("404 Not Found\n") // 内容
         res.end()
     })
-
-
-
 }
 
 module.exports = serverHandle
