@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-10 09:11:15
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-17 11:08:05
+ * @LastEditTime: 2022-05-20 11:43:42
  * @Description: 基础信息配置
  */
 const querystring = require('querystring');
@@ -52,6 +52,7 @@ const getPostData = (req) => {
 }
 
 const serverHandle = (req, res) => {
+    console.log('收到请求啦~~~',req.url)
     // 设置返回格式 JSON
     res.setHeader('Content-type', 'application/json')
 
@@ -73,7 +74,7 @@ const serverHandle = (req, res) => {
         req.cookie[key] = val
     })
 
-    // 解析 session(不用redis)
+    // #region 解析 session(不用redis)
     /* let needSetCookie = false
     let userId = req.cookie.userid
     if (userId) {
@@ -87,7 +88,7 @@ const serverHandle = (req, res) => {
     }
     console.log('SESSION_DATA:',SESSION_DATA)
     req.session = SESSION_DATA[userId] */
-
+    // #endregion
 
     // 解析session（使用redis）
     let needSetCookie = false
@@ -103,7 +104,6 @@ const serverHandle = (req, res) => {
     req.sessionId = userId
     // 获取userId对应的信息
     get(req.sessionId).then(sessionData => {
-        
         if (sessionData == null) {
             // redis中没有存这个userId
             // 初始化 redis 中的 session值

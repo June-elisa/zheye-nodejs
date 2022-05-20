@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-17 09:37:09
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-17 10:21:56
+ * @LastEditTime: 2022-05-20 14:39:37
  * @Description: redis配置
  */
 const redis = require('redis')
@@ -21,6 +21,21 @@ function set(key, val) {
     redisClient.set(key, val, redis.print)
 }
 
+function del(key) {
+    // redisClient.del(key, redis.print)
+    const promise = new Promise((resolve, reject) => {
+        redisClient.del(key, (err, val) => {
+            if (err) {
+                reject(err)
+                return
+            }
+            resolve(val)
+            return  
+        })
+    })
+    return promise
+}
+
 function get(key) {
     const promise = new Promise((resolve, reject) => {
         redisClient.get(key, (err, val) => {
@@ -37,18 +52,19 @@ function get(key) {
             // 这里不是为了抓住异常，而是为了兼容JSON转换的格式
             try {
                 // 对象
-                resolve(JSON.parse(val))              
+                resolve(JSON.parse(val))
             } catch (ex) {
                 // 不是对象
                 resolve(val)
             }
 
-        }) 
+        })
     })
     return promise
 }
 
 module.exports = {
     set,
-    get
+    get,
+    del
 }

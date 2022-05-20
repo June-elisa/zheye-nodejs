@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-11 16:22:21
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-14 09:29:57
+ * @LastEditTime: 2022-05-20 14:48:10
  * @Description: 处理博客数据
  */
 const { exec } = require('../db/mysql')
@@ -14,7 +14,7 @@ const getList = (author, keyword) => {
     if (keyword) {
         sql += `and title like '%${keyword}%'`
     }
-    sql += `order by createtime desc;`
+    sql += `order by create_time desc;`
 
     // 返回 promise
     return exec(sql)
@@ -32,7 +32,7 @@ const newBlog = (blogData = {}) => {
     const { title, content, author } = blogData
     const createtime = Date.now()
     const sql = `
-        insert into blogs(title, content, author, createtime)
+        insert into blogs(title, content, author, create_time)
         values('${title}','${content}','${author}','${createtime}')
     `
     return exec(sql).then(insertData => {

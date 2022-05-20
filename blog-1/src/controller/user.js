@@ -2,20 +2,90 @@
  * @Author: Reya
  * @Date: 2022-05-11 20:38:55
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-14 09:46:09
+ * @LastEditTime: 2022-05-20 15:37:42
  * @Description: 处理用户数据
  */
 const { exec } = require('../db/mysql')
-const login = (username, password) => {
-    console.log(username, password)
+// 登录
+const login = (email, password) => {
+    console.log(email, password)
     const sql = `
-        select username,realname from users where username='${username}' and password='${password}'
+        select id,email,nick_name from users where email='${email}' and password='${password}'
     `
     return exec(sql).then(rows => {
         return rows[0] || {}
     })
 }
 
+// 注册
+const register = (email, nickName, password) => {
+    if (!nickName) {
+        nickName = Math.random().toString(36).slice(2);
+    }
+    const sql = `
+        insert into users(email, password,nick_name) values ('${email}','${password}','${nickName}');
+    `
+    return exec(sql).then(insertData => {
+        console.log('insertData is', insertData)
+        return {
+            id: insertData.insertId
+        }
+    }).catch(err => {
+        throw (err.code)
+    })
+}
+
+// 更新个人资料
+const updateUserInfo = (nickName, description, avatar, id) => {
+    const arr = []
+    if (nickName) {
+        arr.push(`nick_name='${nickName}'`)
+    }
+    if (description) {
+        arr.push(`description='${description}'`)
+    }
+    if (avatar) {
+        arr.push(`avatar='${avatar}'`)
+    }
+    str = arr.join(',')
+
+    const sql = `
+    update users set ${str} where id=${id};
+    `
+    console.log('sql',sql)
+    return exec(sql).then(insertData => {
+        console.log('insertData is', insertData)
+        return {
+            id: insertData.insertId
+        }
+    }).catch(err => {
+        throw (err.code)
+    })
+}
+
+// 获取当前用户信息
+const currentUserInfo = (id) => {
+    const sql = `
+        select id,email,nick_name,avatar,description from users where id='${id}'
+    `
+    return exec(sql).then(rows => {
+        return rows[0] || {}
+    })
+}
+
+// 获取所有用户信息
+const allUserInfo = (id) => {
+    const sql = `
+        select id,email,nick_name,avatar,description from users limit 10
+    `
+    return exec(sql).then(rows => {
+        return rows || []
+    })
+}
 module.exports = {
-    login
+    login,
+    register,
+    updateUserInfo,
+    currentUserInfo,
+    allUserInfo
 }
