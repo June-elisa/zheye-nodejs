@@ -2,10 +2,11 @@
  * @Author: Reya
  * @Date: 2022-05-10 20:36:02
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-20 15:23:42
+ * @LastEditTime: 2022-05-21 11:42:09
  * @Description: 处理博客相关路由
  */
 const { getList, getDetail, newBlog, updateBlog, delBlog } = require('../controller/blog')
+// const { userInfo} = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
 // 统一的登录验证函数
@@ -22,11 +23,15 @@ const handleBlogRouter = (req, res) => {
 
     // 获取博客列表
     if (method === 'POST' && req.path === '/api/blog/list') {
-        const author = req.query.author || ''
-        const keyword = req.query.keyword || ''
-        // const listData = getList(author, keyword)
-        // return new SuccessModel(listData)
-        const result = getList(author, keyword)
+        let { authorId } = req.body
+        console.log('authorId:',authorId)
+        console.log('req.sessionId',req.session.realId)
+        if (!authorId) {
+            authorId = req.session.realId
+        }
+
+
+        const result = getList(authorId)
         return result.then(listData => {
             // return new ErrorModel('OMG!出错了')
             return new SuccessModel(listData)
@@ -50,7 +55,7 @@ const handleBlogRouter = (req, res) => {
         }
  
         req.body.author = req.session.username
-        const result = newBlog(req.body)
+        const result = newBlog(req.body,req.session.realId)
         return result.then(data => {
             return new SuccessModel(data)
         })
@@ -63,8 +68,10 @@ const handleBlogRouter = (req, res) => {
             // 未登录
             return loginCheckResult
         }
-
-        const result = updateBlog(id, req.body)
+        if (!req.body.id) {
+            return Promise.resolve(new ErrorModel('博客id未传'))
+        }
+        const result = updateBlog(req.body)
         return result.then(val => {
             if (val) {
                 return new SuccessModel('更新博客成功')
@@ -83,7 +90,7 @@ const handleBlogRouter = (req, res) => {
             return loginCheckResult
         }
         
-        const result = delBlog(id, req.session.username)
+        const result = delBlog(req.body.id, req.session.realId)
         return result.then(val => {
             if (val) {
                 return new SuccessModel('删除博客成功')

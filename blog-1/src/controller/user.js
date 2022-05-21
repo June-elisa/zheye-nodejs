@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-11 20:38:55
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-20 15:37:42
+ * @LastEditTime: 2022-05-21 12:26:34
  * @Description: 处理用户数据
  */
 const { exec } = require('../db/mysql')
@@ -10,7 +10,7 @@ const { exec } = require('../db/mysql')
 const login = (email, password) => {
     console.log(email, password)
     const sql = `
-        select id,email,nick_name from users where email='${email}' and password='${password}'
+        select id,email,nick_name as nickName from users where email='${email}' and password='${password}'
     `
     return exec(sql).then(rows => {
         return rows[0] || {}
@@ -64,9 +64,9 @@ const updateUserInfo = (nickName, description, avatar, id) => {
 }
 
 // 获取当前用户信息
-const currentUserInfo = (id) => {
+const userInfo = (id) => {
     const sql = `
-        select id,email,nick_name,avatar,description from users where id='${id}'
+        select id,email,nick_name as nickName,avatar,description from users where id='${id}'
     `
     return exec(sql).then(rows => {
         return rows[0] || {}
@@ -76,7 +76,7 @@ const currentUserInfo = (id) => {
 // 获取所有用户信息
 const allUserInfo = (id) => {
     const sql = `
-        select id,email,nick_name,avatar,description from users limit 10
+        select id,email,nick_name as nickName,avatar,description from users limit 10
     `
     return exec(sql).then(rows => {
         return rows || []
@@ -86,6 +86,6 @@ module.exports = {
     login,
     register,
     updateUserInfo,
-    currentUserInfo,
+    userInfo,
     allUserInfo
 }

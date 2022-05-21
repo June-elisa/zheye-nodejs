@@ -2,10 +2,10 @@
  * @Author: Reya
  * @Date: 2022-05-10 20:36:19
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-20 15:32:16
+ * @LastEditTime: 2022-05-21 12:31:21
  * @Description: 处理用户相关路由
  */
-const { login, register, updateUserInfo,currentUserInfo,allUserInfo } = require('../controller/user')
+const { login, register, updateUserInfo, userInfo, allUserInfo } = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { set, del } = require('../db/redis')
 
@@ -115,13 +115,19 @@ const handleUserRouter = (req, res) => {
     // 获取当前用户信息
     if (method === 'GET' && req.path === '/api/user/current') {
         const loginCheckResult = loginCheck(req)
-        if (loginCheckResult) {
-            // 未登录
-            return loginCheckResult
-        }
+        let userId = req.query.userId;
+        if (userId == 0) {
+            if (loginCheckResult) {
+                // 未登录
+                return Promise.resolve(new SuccessModel({}))
+            }
+            userId = req.session.realId
+        } 
 
-        const result = currentUserInfo(req.session.realId)
+
+        const result = userInfo(userId)
         return result.then(data => {
+            console.log('data:',data)
             return new SuccessModel(data)
         }).catch(err => {
             return new ErrorModel(err)
