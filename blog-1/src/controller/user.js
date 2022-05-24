@@ -2,15 +2,23 @@
  * @Author: Reya
  * @Date: 2022-05-11 20:38:55
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-21 12:26:34
+ * @LastEditTime: 2022-05-24 16:42:58
  * @Description: 处理用户数据
  */
-const { exec } = require('../db/mysql')
+const { exec, escape } = require('../db/mysql')
+const { genPassword } = require('../utils/cryp')
+
 // 登录
 const login = (email, password) => {
-    console.log(email, password)
+    // 生成加密密码
+    password = genPassword(password)
+    
+    // 有escape才能去掉单引号
+    email = escape(email)
+    password = escape(password)
+    
     const sql = `
-        select id,email,nick_name as nickName from users where email='${email}' and password='${password}'
+        select id,email,nick_name as nickName from users where email=${email} and password=${password}
     `
     return exec(sql).then(rows => {
         return rows[0] || {}

@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-21 19:51:51
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-21 20:20:09
+ * @LastEditTime: 2022-05-21 22:53:31
  * @Description: nodejs文件操作
  */
 
@@ -31,7 +31,7 @@ const content = '这是新写入的内容\n'
 // 写入配置
 const option = {
     flag:'a' // 'a':追加写入；'w':覆盖
-}
+} 
 fs.writeFile(fileName, content, option, err => {
     if (err) {
         console.error(err)

@@ -2,9 +2,10 @@
  * @Author: Reya
  * @Date: 2022-05-11 16:22:21
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-20 17:02:03
+ * @LastEditTime: 2022-05-24 15:23:36
  * @Description: 处理博客数据
  */
+const xss = require('xss')
 const { exec } = require('../db/mysql')
 const getList = (authorId) => {
     let sql = `select * from blogs where author_id=${authorId}`
@@ -35,6 +36,7 @@ const getDetail = (id) => {
 const newBlog = (blogData = {}, author_id) => {
     //  blogData 是一个博客对象，包含 title content author属性
     const { title, content, image } = blogData
+    title = xss(title)
     let sql = ''
     if (!image) {
         sql = `

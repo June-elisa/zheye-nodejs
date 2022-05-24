@@ -2,11 +2,12 @@
  * @Author: Reya
  * @Date: 2022-05-10 09:11:15
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-21 12:25:43
+ * @LastEditTime: 2022-05-24 10:23:40
  * @Description: 基础信息配置
  */
 const querystring = require('querystring');
 const { get, set } = require('./src/db/redis')
+const {access} = require('./src/utils//log')
 const handleBlogRouter = require('./src/router/blog')
 const handleUserRouter = require('./src/router/user')
 
@@ -52,7 +53,9 @@ const getPostData = (req) => {
 }
 
 const serverHandle = (req, res) => {
-    console.log('收到请求啦~~~',req.url)
+    console.log('收到请求啦~~~', req.url)
+    // 记录 access log
+    access(` ${req.method} -- ${req.url} -- ${req.headers['user-agent']} -- ${Date.now()}`)
     // 设置返回格式 JSON
     res.setHeader('Content-type', 'application/json')
 

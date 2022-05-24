@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-13 15:07:21
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-13 20:35:46
+ * @LastEditTime: 2022-05-24 14:49:40
  * @Description: 
  */
 const mysql = require('mysql');
@@ -30,5 +30,6 @@ function exec(sql) {
 }
 
 module.exports = {
-    exec
+    exec,
+    escape:mysql.escape
 }
