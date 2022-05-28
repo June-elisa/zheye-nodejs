@@ -1,0 +1,2 @@
+::1 - - [28/May/2022:13:25:18 +0000] "POST /api/blog/del HTTP/1.1" 200 52 "-" "PostmanRuntime/7.29.0"
+::1 - - [28/May/2022:13:25:19 +0000] "POST /api/blog/del HTTP/1.1" 200 52 "-" "PostmanRuntime/7.29.0"
