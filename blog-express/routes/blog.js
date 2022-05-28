@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-24 18:59:58
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-25 23:12:23
+ * @LastEditTime: 2022-05-28 18:56:25
  * @Description: 博客路由
  */
 var express = require('express');
@@ -22,7 +22,7 @@ const loginCheck = require('../middleware/loginCheck')
 
 
 // 某用户的博客列表
-router.get('/list', (req, res, next) => {
+router.post('/list', (req, res, next) => {
     let { authorId } = req.body
     if (!authorId) {
         authorId = req.session.realId
