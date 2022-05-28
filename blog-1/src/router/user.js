@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-10 20:36:19
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-21 12:31:21
+ * @LastEditTime: 2022-05-26 10:06:08
  * @Description: 处理用户相关路由
  */
 const { login, register, updateUserInfo, userInfo, allUserInfo } = require('../controller/user')
@@ -135,7 +135,7 @@ const handleUserRouter = (req, res) => {
     }
 
     // 获取所有用户信息
-    if (method === 'GET' && req.path === '/api/column/list') {
+    if (method === 'GET' && req.path === '/api/user/list') {
         const result = allUserInfo()
         return result.then(data => {
             return new SuccessModel(data)

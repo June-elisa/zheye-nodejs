@@ -2,11 +2,10 @@
  * @Author: Reya
  * @Date: 2022-05-10 20:36:02
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-21 11:42:09
+ * @LastEditTime: 2022-05-25 14:07:36
  * @Description: 处理博客相关路由
  */
 const { getList, getDetail, newBlog, updateBlog, delBlog } = require('../controller/blog')
-// const { userInfo} = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
 // 统一的登录验证函数
@@ -24,8 +23,6 @@ const handleBlogRouter = (req, res) => {
     // 获取博客列表
     if (method === 'POST' && req.path === '/api/blog/list') {
         let { authorId } = req.body
-        console.log('authorId:',authorId)
-        console.log('req.sessionId',req.session.realId)
         if (!authorId) {
             authorId = req.session.realId
         }
@@ -33,7 +30,6 @@ const handleBlogRouter = (req, res) => {
 
         const result = getList(authorId)
         return result.then(listData => {
-            // return new ErrorModel('OMG!出错了')
             return new SuccessModel(listData)
         })
     }
