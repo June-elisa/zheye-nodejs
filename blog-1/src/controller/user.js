@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-11 20:38:55
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-24 16:42:58
+ * @LastEditTime: 2022-12-08 19:32:17
  * @Description: 处理用户数据
  */
 const { exec, escape } = require('../db/mysql')
@@ -27,6 +27,7 @@ const login = (email, password) => {
 
 // 注册
 const register = (email, nickName, password) => {
+    password = genPassword(password)
     if (!nickName) {
         nickName = Math.random().toString(36).slice(2);
     }

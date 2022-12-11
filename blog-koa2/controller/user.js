@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-11 20:38:55
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-28 17:31:00
+ * @LastEditTime: 2022-12-09 22:44:14
  * @Description: 处理用户数据
  */
 const { exec, escape } = require('../db/mysql')
@@ -27,6 +27,7 @@ const login = async (email, password) => {
 
 // 注册
 const register = async (email, nickName, password) => {
+    password = genPassword(password);
     if (!nickName) {
         nickName = Math.random().toString(36).slice(2);
     }
@@ -81,8 +82,9 @@ const allUserInfo = async () => {
     const sql = `
         select id,email,nick_name as nickName,avatar,description from users limit 10
     `
+    console.log(sql);
     const rows = await exec(sql)
-    return rows[0] || {}
+    return rows|| []
 }
 module.exports = {
     login,

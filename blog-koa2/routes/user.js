@@ -2,7 +2,7 @@
  * @Author: Reya
  * @Date: 2022-05-28 14:58:08
  * @LastEditors: Reya
- * @LastEditTime: 2022-05-28 21:06:54
+ * @LastEditTime: 2022-12-09 22:41:47
  * @Description: 用户相关路由
  */
 const router = require('koa-router')()
@@ -39,11 +39,11 @@ router.post('/login', async (ctx, next) => {
 
 // 注册
 router.post('/register', async (ctx, next) => {
+    const {email,nickName, password } = ctx.request.body
     try {
         const data = await register(email, nickName, password)
         ctx.body = new SuccessModel(data, '注册成功')
     } catch (err) {
-        console.log('err', err)
         if (err === 'ER_DUP_ENTRY') {
             ctx.body = new ErrorModel('该邮箱已被注册！')
         } else {
@@ -101,7 +101,8 @@ router.get('/current', async (ctx, next) => {
 // 获取所有用户的信息
 router.get('/list', async (ctx, next) => {
     try {
-        const data = await allUserInfo()        
+        const data = await allUserInfo();
+        console.log(data)
         ctx.body = new SuccessModel(data)      
     } catch (err) {
         ctx.body = new ErrorModel(err)     
