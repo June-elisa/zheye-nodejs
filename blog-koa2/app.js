@@ -7,6 +7,8 @@ const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger') // 只是让日志打印变好看
 const session = require('koa-generic-session')
 const redisStore = require('koa-redis')
+const { historyApiFallback } = require('koa2-connect-history-api-fallback');
+
 
 const path = require('path')
 const fs = require('fs')
@@ -22,12 +24,18 @@ const { REDIS_CONF } = require('./conf/db')
 // error handler
 onerror(app)
 
+
 // middlewares
 app.use(bodyparser({
   enableTypes: ['json', 'form', 'text']
 }))
 app.use(json())
 app.use(logger())
+// 区分前后端路由
+app.use(historyApiFallback({ 
+  whiteList: ['/api']
+}));
+
 app.use(require('koa-static')(__dirname + '/public'))
 
 app.use(views(__dirname + '/views', {
